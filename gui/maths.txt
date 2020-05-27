@@ -1,0 +1,4 @@
+board width = (18 squares * square width) + (19 x 1pxl lines) + (2 * horizontal padding)
+board height = (18 squares * square height) + (19 x 1pxl lines) + (2 * vertical padding)
+x coordinate = horizontal padding + 1 + (x * (square width + 1))
+y coordinate = (y + (vertical padding + 1)) + (y * (square height + 1))

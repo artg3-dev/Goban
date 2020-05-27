@@ -1,8 +1,11 @@
 from tkinter import Canvas
 from tkinter import Frame
 from tkinter import BOTH
+from tkinter import Event
+from math import ceil
+from math import floor
 
-
+from gamerules.kifu_tracker import KifuTracker
 
 
 
@@ -27,73 +30,165 @@ TODO:
 class GobanDisplay(Frame):
     COLORS = {'B':'Black', 'W':'White'}
 
-    def __init__(self, master, height=608, width=608):
+    def __init__(self, master,
+      sq_width=30, sq_height=30, h_pad=50, w_pad=50,
+      board_color='#FFE15C', marking_color='#373737'):
         Frame.__init__(self, master)
         self.grid()
 
-        self.canvas = Canvas(self, bg='#FFE15C', height=height, width=height)
+        # Colors
+        self.board_color = board_color
+        self.marking_color = marking_color
 
-        # _div is the division factor for grid spacing
-        self.hdiv = height / 20
-        self.wdiv = width / 20
+        # Dimensions of the goban
+        self.sq_width = sq_width
+        self.sq_height = sq_height
+        self.h_pad = h_pad
+        self.w_pad = w_pad
+        self.width = (18 * self.sq_width) + (19) + (2 * self.h_pad)
+        self.height = (18 * self.sq_height) + (19) + (2 * self.w_pad)
 
-        # Draw Grid
-        for i in range(19):
+        # Stored information for use by methods
+        self.tracker = KifuTracker()
+        self.stones = {}
+        self.highlighted = None
+        self.highlighted_move = None
+        self._move_color = 'B'
+
+        self.canvas = Canvas(self, bg=self.board_color,
+          height=self.height, width=self.height, cursor='none')
+        self.canvas.bind('<Motion>', self._highlight)
+        self.canvas.bind('<Button-1>', self.add_move)
+
+        self._add_grid()
+        self._add_markers()
+        self._add_grid_labels()
+
+        self.canvas.pack(fill=BOTH, padx=5, pady=5)
+
+
+    def add_move(self, event:Event):
+        color, x, y = self.highlighted_move
+        if self.tracker.space_is_open(self.highlighted_move):
+            # Add move/stone to all relevant datasets
+            self.tracker.add_move(self.highlighted_move)
+            stone = self._place_stone(color, x, y)
+            self.stones[self.highlighted_move] = stone
+
+            # Remove highlighting effect
+            self.canvas.delete(self.highlighted)
+            self.highlighted = None
+            self.highlighted_move = None
+
+            if self._move_color == 'B':
+                self._move_color = 'W'
+            else:
+                self._move_color = 'B'
+
+    def _highlight(self, event:Event, color='#00E218'):
+        x, y = self._get_nearest(event.x, event.y)
+        self.canvas.delete(self.highlighted)
+        if (x >= 0 and x < 19) and (y >= 0 and y < 19):
+            self.highlighted = self._draw_circle(x+1, y+1, 14.5,
+              outline_color=color, fill_color=None, thickness=2)
+            self.highlighted_move = (self._move_color, x + 1, y + 1)
+        else:
+            self.highlighted_move = None
+
+    def _get_nearest(self, x, y):
+        nearest_y = round((y - self.h_pad) / self.sq_height)
+        nearest_x = round((x - self.w_pad) / self.sq_width)
+        return nearest_x, nearest_y
+
+    def _get_pixel(self, x, y):
+        # Convert from go numbering to python numbering
+        x -= 1
+        y -= 1
+
+        x_coord = (self.h_pad + 1) + (x * (self.sq_width + 1))
+        y_coord = (self.w_pad + 1) + (y * (self.sq_height + 1))
+        return x_coord, y_coord
+
+    def _add_grid(self):
+        for i in range(1, 20):
             # Vertical Line
-            x = (i * self.wdiv) + self.wdiv # add wdiv to get off of the edge by 1 square
-            y1 = self.hdiv
-            y2 = height - self.hdiv
-            self.canvas.create_line(x, y1, x, y2)
+            x, y1 = self._get_pixel(i, 1)
+            _, y2 = self._get_pixel(i, 19)
+            self.canvas.create_line(x, y1, x, y2 + 1, fill=self.marking_color)  # +1 for overlap
 
             # Horizontal Line
-            y = (i * self.hdiv) + self.hdiv
-            x1 = self.wdiv
-            x2 = (width - self.wdiv) + 1 # +1 to overlap on the edge
-            self.canvas.create_line(x1, y, x2, y)
+            x1, y = self._get_pixel(1, i)
+            x2, _ = self._get_pixel(19, i)
+            self.canvas.create_line(x1, y, x2, y, fill=self.marking_color)
 
+    def _add_markers(self):
         # Marker Coords
         markers = [
-            # Corners
-            (4, 4), (16, 16), (4, 16), (16, 4),
-            # Sides
-            (10, 4), (4, 10), (16, 10), (10, 16),
-            # Tengen
-            (10, 10)
+        # Corners
+        (4, 4), (16, 16), (4, 16), (16, 4),
+        # Sides
+        (10, 4), (4, 10), (16, 10), (10, 16),
+        # Tengen
+        (10, 10)
         ]
 
         # Draw Marking Circles
         for x, y in markers:
-            ox1 = (x * self.wdiv) - int(self.wdiv/4) + 4
-            oy1 = (y * self.hdiv) - int(self.hdiv/4) + 4
-            ox2 = (x * self.wdiv) + int(self.wdiv/4) - 4
-            oy2 = (y * self.hdiv) + int(self.hdiv/4) - 4
-            self.canvas.create_oval(ox1, oy1, ox2, oy2,
-              outline='Black', fill='Black')
+            self._draw_circle(x, y, 3, self.marking_color, self.marking_color)
 
-        self.canvas.pack(fill=BOTH, padx=5, pady=5)
+    def _add_grid_labels(self):
+        offset = 25
+        labels = list('ABCDEFGHJKLMNOPQRST')
 
-    def place_stone(self, color:str, x:int, y:int):
-        # Verify valid color input
-        if color not in list(self.COLORS.keys()):
-            print(color)
-            raise ValueError('Player color not valid')
-        else:
+        for i, char in enumerate(labels):
+            i += 1 # Convert from py numbering to go numbering
+
+            # Left
+            _, y = self._get_pixel(0, i)
+            x = self.h_pad - offset
+            self.canvas.create_text(x, y, text=str(20 - i),
+              fill=self.marking_color)
+
+            # Right
+            x = (self.width - self.h_pad) + offset
+            self.canvas.create_text(x, y, text=str(20 - i),
+              fill=self.marking_color)
+
+            # Top
+            x, _ = self._get_pixel(i, 0)
+            y = self.w_pad - offset
+            self.canvas.create_text(x, y, text=char,
+              fill=self.marking_color)
+
+            # Top
+            y = (self.height - self.w_pad) + offset
+            self.canvas.create_text(x, y, text=char,
+              fill=self.marking_color)
+
+    def _draw_circle(self, x, y, r, outline_color, fill_color, thickness=1):
+        x_center, y_center = self._get_pixel(x, y)
+        x1 = x_center - r
+        y1 = y_center - r
+        x2 = x_center + r
+        y2 = y_center + r
+
+        return self.canvas.create_oval(x1, y1, x2, y2,
+          outline=outline_color, fill=fill_color, width=thickness)
+
+    def _place_stone(self, color:str, x:int, y:int, stone_size=14.5):
+        try:
             stone_color = self.COLORS[color]
+        except KeyError:
+            raise KeyError("Invalid Stone Color: Use either 'B' or 'W'")
 
-        # +/- 1 are for shrinking the stone by 2 pixels from grid width
-        ox1 = (x * self.wdiv) - int(self.wdiv/2) + 1
-        oy1 = (y * self.hdiv) - int(self.hdiv/2) + 1
-        ox2 = (x * self.wdiv) + int(self.wdiv/2) - 1
-        oy2 = (y * self.hdiv) + int(self.hdiv/2) - 1
-
-        self.canvas.create_oval(ox1, oy1, ox2, oy2, outline=stone_color, fill=stone_color)
+        return self._draw_circle(x, y, stone_size, stone_color, stone_color)
 
     def load_sgf_from_text(self, sgf_text):
         import sgf_tools.sgf_parser as parser
         moves = sgf_text.split('\n')
         for move in moves:
             color, x, y = parser.parse_move(move)
-            self.place_stone(color, x, y)
+            self._place_stone(color, x, y)
 
 def main():
     # Testing purposes only
