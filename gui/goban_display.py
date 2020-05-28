@@ -13,8 +13,7 @@ from gamerules.kifu_tracker import KifuTracker
 """
 TODO:
 - Separate the game board into a class, separate from the gui display!
-    * Store moves 1 by 1 in list for moving forward and backwards
-- Add coordinates (big yikes)
+    * Clean up methods that double up on checking move validity (add_move)
 - Move sgf loading into the parser
 """
 
@@ -184,6 +183,7 @@ class GobanDisplay(Frame):
 
         return self._draw_circle(x, y, stone_size, stone_color, stone_color)
 
+    # Testing method to be removed
     def load_sgf_from_text(self, sgf_text):
         import sgf_tools.sgf_parser as parser
         moves = sgf_text.split('\n')

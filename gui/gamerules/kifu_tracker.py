@@ -11,7 +11,7 @@ from collections import deque
 
 """
 TODO:
-- Keep track of captured stones for each color
+- Move goban into it's own class for readability
 
 
 """
@@ -31,8 +31,7 @@ class InvalidMoveError(Exception):
 class KifuTracker(object):
     def __init__(self):
         self.move_history = deque()
-        self.b_captures = 0
-        self.w_captures = 0
+        self.captured_stones = {'B':0, 'W':0}
         self.board = [['-' for i in range(19)] for i in range(19)]
 
     def space_is_open(self, x, y):
@@ -53,11 +52,24 @@ class KifuTracker(object):
         else:
             raise InvalidMoveError(0)
 
+    def remove_stone(self, move:tuple):
+        color, x, y = move
+        self.board[x - 1][y - 1] = '-'
+        self.captured_stones[color] += 1
+
     def _get_removals(self, move):
-        # Setup
-        checked_moves = set()
-        to_check = set()
-        to_check.add(move)
+        # Get all neighboring groups
+        removals = []
+        neighbors = self._get_neighbor_stones(move)
+        n_groups = [self.get_connected_group(m) for m in neighbors]
+        for group in n_groups:
+            if self.count_liberties(group) == 0:
+                for stone in group:
+                    self.remove_stone(stone)
+                    removals.append(stone)
+
+        return tuple(removals)
+
 
     def _get_neighbor_stones(self, move):
         neighbors = []
@@ -128,30 +140,38 @@ class KifuTracker(object):
         return(tuple(possible_neighbors))
 
 
+
+
+
+
+
+# Testing methods
 def add_testing_moves(tracker:KifuTracker):
-    move_1 = ('W', 10, 10)
+    move_1 = ('B', 10, 10)
     move_2 = ('W', 9, 10)
-    move_3 = ('W', 9, 11)
-    move_4 = ('W', 8, 10)
-    move_5 = ('W', 8, 11)
+    move_3 = ('W', 11, 10)
+    move_4 = ('W', 10, 9)
+    move_5 = ('W', 10, 11)
     move_6 = ('W', 7, 10)
-    # tracker.add_move(move_1)
+    tracker.add_move(move_1)
     # print(tracker.get_connected_group(move_1))
     tracker.add_move(move_2)
     # print(tracker.get_connected_group(move_2))
-    # tracker.add_move(move_3)
+    tracker.add_move(move_3)
     # print(tracker.get_connected_group(move_3))
-    # tracker.add_move(move_4)
+    tracker.add_move(move_4)
     # print(tracker.get_connected_group(move_4))
-    # tracker.add_move(move_5)
+    tracker.add_move(move_5)
     # print(tracker.get_connected_group(move_5))
     # tracker.add_move(move_6)
     # print(tracker.get_connected_group(move_6))
-    group = tracker.get_connected_group(move_2)
-    libs = tracker.count_liberties(group)
+    # group = tracker.get_connected_group(move_2)
+    # libs = tracker.count_liberties(group)
 
-    print(f'Liberties: {libs}')
+    # print(f'Liberties: {libs}')
     print(tracker)
+    print(tracker.captured_stones)
+    print(tracker.move_history)
 
 def main():
     tracker = KifuTracker()
