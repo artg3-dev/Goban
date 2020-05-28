@@ -96,12 +96,9 @@ class KifuTracker(object):
     def count_liberties(self, group:tuple):
         open_spaces = set()
         for stone in group:
-            print('stone', stone)
             for n in self._get_possible_neighbors(stone):
-                print('neighbor', n)
                 if self.space_is_open(n[0], n[1]):
                     open_spaces.add(n)
-                    print('lib count', len(open_spaces))
 
         return len(open_spaces)
 
@@ -138,17 +135,17 @@ def add_testing_moves(tracker:KifuTracker):
     move_4 = ('W', 8, 10)
     move_5 = ('W', 8, 11)
     move_6 = ('W', 7, 10)
-    tracker.add_move(move_1)
+    # tracker.add_move(move_1)
     # print(tracker.get_connected_group(move_1))
     tracker.add_move(move_2)
     # print(tracker.get_connected_group(move_2))
-    tracker.add_move(move_3)
+    # tracker.add_move(move_3)
     # print(tracker.get_connected_group(move_3))
-    tracker.add_move(move_4)
+    # tracker.add_move(move_4)
     # print(tracker.get_connected_group(move_4))
-    tracker.add_move(move_5)
+    # tracker.add_move(move_5)
     # print(tracker.get_connected_group(move_5))
-    tracker.add_move(move_6)
+    # tracker.add_move(move_6)
     # print(tracker.get_connected_group(move_6))
     group = tracker.get_connected_group(move_2)
     libs = tracker.count_liberties(group)
