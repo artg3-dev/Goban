@@ -69,7 +69,8 @@ class GobanDisplay(Frame):
 
     def add_move(self, event:Event):
         color, x, y = self.highlighted_move
-        if self.tracker.space_is_open(self.highlighted_move):
+        if self.tracker.space_is_open(self.highlighted_move[1], # [1] = x ...
+          self.highlighted_move[2]):
             # Add move/stone to all relevant datasets
             self.tracker.add_move(self.highlighted_move)
             stone = self._place_stone(color, x, y)
