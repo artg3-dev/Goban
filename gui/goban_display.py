@@ -6,6 +6,7 @@ from math import ceil
 from math import floor
 
 from gamerules.kifu_tracker import KifuTracker
+from gamerules.kifu_tracker import InvalidMoveError
 
 
 
@@ -68,18 +69,26 @@ class GobanDisplay(Frame):
 
     def add_move(self, event:Event):
         color, x, y = self.highlighted_move
-        if self.tracker.space_is_open(self.highlighted_move[1], # [1] = x ...
-          self.highlighted_move[2]):
-            # Add move/stone to all relevant datasets
-            self.tracker.add_move(self.highlighted_move)
+        # Add move/stone to all relevant datasets
+        try:
+            captures = self.tracker.add_move(self.highlighted_move)
+        except InvalidMoveError:
+            pass
+        else:
             stone = self._place_stone(color, x, y)
             self.stones[self.highlighted_move] = stone
+
+            # Remove captures
+            for move in captures:
+                stone = self.stones[move]
+                self.canvas.delete(stone)
 
             # Remove highlighting effect
             self.canvas.delete(self.highlighted)
             self.highlighted = None
             self.highlighted_move = None
 
+            # Update next move color
             if self._move_color == 'B':
                 self._move_color = 'W'
             else:
