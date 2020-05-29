@@ -72,16 +72,17 @@ class GobanDisplay(Frame):
         # Add move/stone to all relevant datasets
         try:
             captures = self.tracker.add_move(self.highlighted_move)
-        except InvalidMoveError:
-            pass
+        except InvalidMoveError as e:
+            print(e.error_type)
         else:
             stone = self._place_stone(color, x, y)
             self.stones[self.highlighted_move] = stone
 
             # Remove captures
-            for move in captures:
-                stone = self.stones[move]
-                self.canvas.delete(stone)
+            if captures:
+                for move in captures:
+                    stone = self.stones[move]
+                    self.canvas.delete(stone)
 
             # Remove highlighting effect
             self.canvas.delete(self.highlighted)

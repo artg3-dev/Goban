@@ -12,7 +12,7 @@ from collections import deque
 """
 TODO:
 - Move goban into it's own class for readability
-
+- Disallow self-capture moves
 
 """
 
@@ -47,8 +47,20 @@ class KifuTracker(object):
         color, x, y = move
         if self.space_is_open(move[1], move[2]): # [1] = x ...
             self.board[x - 1][y - 1] = color
-            self.move_history.append(move)
-            return self._get_removals(move)
+
+            move_group = self.get_connected_group(move)
+            captures = self._get_removals(move)
+
+            # Check for suicidal move
+            if self.count_liberties(move_group) == 0 and not captures:
+                self.board[x - 1][y - 1] = '-'
+                raise InvalidMoveError(1)
+            else: # If move is valid
+                self.move_history.append(move)
+                if captures:
+                    for stone in captures:
+                        self._remove_stone(stone)
+                return captures
         else:
             raise InvalidMoveError(0)
 
@@ -63,9 +75,10 @@ class KifuTracker(object):
         neighbors = self._get_neighbor_stones(move)
         n_groups = [self.get_connected_group(m) for m in neighbors]
         for group in n_groups:
+            if group[0][0] == move[0]: # Won't check group of same color
+                continue
             if self.count_liberties(group) == 0:
                 for stone in group:
-                    self._remove_stone(stone)
                     removals.append(stone)
 
         return tuple(removals)
