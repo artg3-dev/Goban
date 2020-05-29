@@ -31,7 +31,7 @@ class InvalidMoveError(Exception):
 class KifuTracker(object):
     def __init__(self):
         self.move_history = deque()
-        self.captured_stones = {'B':0, 'W':0}
+        self.captures = {'B':0, 'W':0}
         self.board = [['-' for i in range(19)] for i in range(19)]
 
     def space_is_open(self, x, y):
@@ -67,7 +67,7 @@ class KifuTracker(object):
     def _remove_stone(self, move:tuple):
         color, x, y = move
         self.board[x - 1][y - 1] = '-'
-        self.captured_stones[color] += 1
+        self.captures[color] += 1
 
     def _get_removals(self, move):
         # Get all neighboring groups
@@ -183,7 +183,7 @@ def add_testing_moves(tracker:KifuTracker):
 
     # print(f'Liberties: {libs}')
     print(tracker)
-    print(tracker.captured_stones)
+    print(tracker.captures)
     print(tracker.move_history)
 
 def main():

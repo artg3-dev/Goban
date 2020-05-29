@@ -243,6 +243,7 @@ def random_stone(display):
     with open('sgf info.sgf') as f:
         text = f.read()
     display.load_sgf_from_text(text)
+    print(display.tracker.captures)
 
 
 if __name__ == '__main__':
