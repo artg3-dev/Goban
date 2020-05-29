@@ -52,7 +52,7 @@ class KifuTracker(object):
         else:
             raise InvalidMoveError(0)
 
-    def remove_stone(self, move:tuple):
+    def _remove_stone(self, move:tuple):
         color, x, y = move
         self.board[x - 1][y - 1] = '-'
         self.captured_stones[color] += 1
@@ -65,7 +65,7 @@ class KifuTracker(object):
         for group in n_groups:
             if self.count_liberties(group) == 0:
                 for stone in group:
-                    self.remove_stone(stone)
+                    self._remove_stone(stone)
                     removals.append(stone)
 
         return tuple(removals)
