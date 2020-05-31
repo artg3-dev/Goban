@@ -67,16 +67,22 @@ class GobanDisplay(Frame):
         self.canvas.pack(fill=BOTH, padx=5, pady=5)
 
 
-    def add_move(self, event:Event):
-        color, x, y = self.highlighted_move
+    def add_move(self, *args):
+        if len(args) == 1 and type(args[0]) == Event:
+            color, x, y = self.highlighted_move
+            move = self.highlighted_move
+        elif len(args) == 1 and type(args[0]) == tuple and len(args[0]) == 3:
+            color, x, y = args[0]
+            move = args[0]
+
         # Add move/stone to all relevant datasets
         try:
-            captures = self.tracker.add_move(self.highlighted_move)
+            captures = self.tracker.add_move(move)
         except InvalidMoveError as e:
             print(e.error_type)
         else:
             stone = self._place_stone(color, x, y)
-            self.stones[self.highlighted_move] = stone
+            self.stones[move] = stone
 
             # Remove captures
             if captures:
@@ -198,8 +204,9 @@ class GobanDisplay(Frame):
         import sgf_tools.sgf_parser as parser
         moves = sgf_text.split('\n')
         for move in moves:
-            color, x, y = parser.parse_move(move)
-            self._place_stone(color, x, y)
+            stone = parser.parse_move(move)
+            print(stone)
+            self.add_move(stone)
 
 def main():
     # Testing purposes only
@@ -236,6 +243,7 @@ def random_stone(display):
     with open('sgf info.sgf') as f:
         text = f.read()
     display.load_sgf_from_text(text)
+    print(display.tracker.captures)
 
 
 if __name__ == '__main__':
