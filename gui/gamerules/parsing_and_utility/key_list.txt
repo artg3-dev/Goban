@@ -1,0 +1,55 @@
+AB	Add Black	pointlist	Add black setup or handicap stones, e.g., AB[dp][pd]
+AE	Add Empty	pointlist	Make the indicated fields empty
+AN	Annotator	simpletext	Author of the game analysis
+AP	Application	simpletext	SGF editor used
+AW	Add White	pointlist	Add white stones
+B	Black move	move	Make a black move
+BC	Black Country	simpletext	Country of the black player, e.g. CN, JP, KR, TW
+BL	Black time Left	time	Time left after this move
+BR	Black Rank	simpletext	Rank of black player, e.g. Honorary Meijin, 9p, 6d ama, 15k
+BT	Black Team	simpletext	Team of the black player
+C	Comment	text	Any comment
+CA	Character set	simpletext	Character set of the text fields (e.g., UTF-8, GB2312, SJIS, ISO-2022-KR, ISO-8859-15)
+CP	Copyright	simpletext	Copyright holder
+CR	Circle	pointlist	Mark the indicated stones with a circle
+DT	Date	simpletext	Date, given in Western style, preferably in ISO standard form
+EV	Event	simpletext	Tournament or other event
+FF	File Format	number	SGF file format, e.g., FF[1], FF[3], FF[4]
+GC	Game Comment	text	Any comment. E.g. GC[This is Cho Chikun's 1000th win as a professional], GC[Translated by Megumi Kawai], GC[Wang Lei made an illegal ko capture on move 223 in what should have been a void game due to triple ko. He was ruled to have passed on that move and the position was restored with Zhou to move]
+GM	Game	number	GM[1]: Go. Higher numbers denote other games, see GM
+GN	Game Name	simpletext	Filename, number or identifier associated with the game
+HA	Handicap	number	Number of handicap stones
+JD	Japanese Date	simpletext	Date, given in Japanese Era, Year, Month, Day format
+KM	Komi	real	Possibly negative number of points paid by Black to White
+LB	Label	labellist	E.g. LB[], LB[kg:a], LB[fm:F][fj:E][fk:D][gj:C][gk:B][hi:A]
+LC	Number of Byo-yomi	number	Number of byo-yomi periods
+LT	Length Byo-yomi	time	Length of byo-yomi periods
+MA	Mark	pointlist	Mark the indicated stones with an 'X'
+MN	Move Number	number	In the rootnode: the number of moves of the game. Elsewhere: the request to label the move with the given number
+N	Node name	simpletext	E.g. N[Diagram 1], N[Sacrifice]
+OB	Overtime Black	number	Number of black moves still to make in this byo-yomi period
+OH	Old Handicap	simpletext	E.g. OH[(B)BW] for sen-ai-sen, a handicap where the weaker player takes Black two out of every three games, and takes Black in the present game
+OT	Overtime	simpletext	Description of the type of byo-yomi used
+OW	Overtime White	number	Number of white moves still to make in this byo-yomi period
+PB	Player Black	simpletext	Name of black player
+PC	Place	simpletext	Location of the game
+PL	Player to play	color	Player to go first (B or W)
+PW	Player White	simpletext	Name of white player
+RE	Result	simpletext	E.g. Jigo, B+3.5, W+T, Void. See RE
+RO	Round	simpletext	Tournament stage or round
+RU	Rules	simpletext	Rule set in use
+SL	Selected points	pointlist	Select a number of points in order to refer to them in a comment
+SO	Source	simpletext	Game source. E.g. SO[weiqi.com.tom], SO[Kido yearbook 1969]
+SQ	Square	pointlist	Mark the indicated stones with a square
+SZ	Size	number | numberpair	E.g. SZ[19], or SZ[2:9] for a 2x9 board (with 2 columns and 9 rows)
+TB	Territory Black	pointlist	Black territory
+TM	Time	time	Total time for each player
+TR	Triangle	pointlist	Mark the indicated stones with a triangle
+TW	Territory White	pointlist	White territory
+US	User	simpletext	User who entered the game
+VW	View	pointlist	Part of the board to be shown. A subsequent VW[] removes this restriction
+W	White move	move	Make a white move
+WC	White Country	simpletext	Country of the white player
+WL	White time Left	time	Time left after this move
+WR	White Rank	simpletext	Rank of white player
+WT	White Team	simpletext	Team of the white player
